@@ -1,0 +1,3 @@
+[submodule "TOTP-MCU"]
+	path = TOTP-MCU
+	url = https://github.com/weravech/TOTP-MCU.git
