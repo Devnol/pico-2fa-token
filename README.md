@@ -1,4 +1,3 @@
-# pico-clock
+# pico-2fa-token
 
-A desk clock for the Raspberry pi pico, with date.
-
+Turn your raspberri Pi Pico into a time-based 2fa authenticator! Why, I hear you ask? Well why not?
