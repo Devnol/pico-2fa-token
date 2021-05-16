@@ -3,3 +3,6 @@ build/
 
 #macOS resources
 .DS_Store
+
+#hmac Token
+token.h

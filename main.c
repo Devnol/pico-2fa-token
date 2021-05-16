@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include "token.h" //make file 
 #include <time.h>
+#include "TOTP-MCU/TOTP.h"
 #include "pico/stdlib.h"
 #include "pico/util/datetime.h"
 #include "hardware/gpio.h"
@@ -8,19 +10,20 @@
 #define BUTTON_L_PIN 2
 #define BUTTON_SEL_PIN 6
 #define BUTTON_R_PIN 10
+#define TZ_OFFSET 3 //change time zone offset to your locale
 
 int get_number(int min, int def, int max, char label[6]){
     int curr_num = def;
     printf("\n");
-    while (gpio_get(BUTTON_SEL_PIN)) {
-        printf("\r"); //clear terminal and go home
+    while (!gpio_get(BUTTON_SEL_PIN)) {
+        printf("\r");
         printf("%s: %d", label, curr_num);
-        if (!gpio_get(BUTTON_L_PIN)) curr_num--;
-        else if (!gpio_get(BUTTON_R_PIN)) curr_num++;
+        if (gpio_get(BUTTON_L_PIN)) curr_num--;
+        else if (gpio_get(BUTTON_R_PIN)) curr_num++;
         
         if (curr_num < min) curr_num = max;
         if (curr_num > max) curr_num = min;
-        sleep_ms(100); 
+        sleep_ms(150); 
     } return curr_num;
 }
 
@@ -37,13 +40,13 @@ int main() {
     gpio_set_dir(BUTTON_R_PIN, GPIO_IN);
     gpio_set_dir(BUTTON_SEL_PIN, GPIO_IN);
 
-    //obtain date and time
+    ////obtain date and time
 
-        int year = get_number(0, 2020, 4095, "Year");
-        sleep_ms(1000);
+        int year = get_number(0, 2021, 4095, "Year");
+        sleep_ms(400);
 
         int month = get_number(1, 1, 12, "Month");
-        sleep_ms(1000);
+        sleep_ms(400);
         
         //determine limit of days of month
         int maxday;
@@ -64,16 +67,16 @@ int main() {
             
         
         int day = get_number(1, 1, maxday, "Day");
-        sleep_ms(1000);
+        sleep_ms(400);
 
-        int hour = get_number(0, 0, 23, "Hour");
-        sleep_ms(1000);
+        int hour = get_number(0, 0, 23, "Hour") - TZ_OFFSET;
+        sleep_ms(400);
 
         int minute = get_number(0, 0, 59, "Min");
-        sleep_ms(1000);
+        sleep_ms(400);
 
         int second = get_number(0, 0, 59, "Sec");
-        sleep_ms(1000);
+        sleep_ms(400);
 
     char datetime_buf[256];
     char *datetime_str = &datetime_buf[0];
@@ -94,13 +97,17 @@ int main() {
     struct tm tm;
     time_t epoch;
 
+        TOTP(hmacKey, 10, 30);
     while (true) {
         rtc_get_datetime(&t);
         datetime_to_str(datetime_str, sizeof(datetime_buf), &t);
         if ( strptime(datetime_str, "%A %d %b %H:%M:%S %Y", &tm) != NULL ) {
             epoch = mktime(&tm);
         }
-        printf("\rTime: %s      Unix Timestamp: %d", datetime_str, epoch);
+        strptime(datetime_str, "%A %d %b %H:%M:%S %Y", &tm);
+        uint32_t newCode = getCodeFromTimestamp(epoch);
+        printf("Token: %d\n", newCode);
+        printf("Date: %s  %d\n", datetime_str, epoch);
         sleep_ms(1000);
     }
     return 0;    
