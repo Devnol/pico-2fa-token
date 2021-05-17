@@ -1,18 +1,23 @@
 #include <stdio.h>
-#include "token.h" //make file 
 #include <time.h>
+#include "token.h"
 #include "TOTP-MCU/TOTP.h"
 #include "pico/stdlib.h"
 #include "pico/util/datetime.h"
 #include "hardware/gpio.h"
 #include "hardware/rtc.h"
 
-#define BUTTON_L_PIN 2
-#define BUTTON_SEL_PIN 6
-#define BUTTON_R_PIN 10
-#define TZ_OFFSET 3 //change time zone offset to your locale
+//----------- DO NOT EDIT ABOVE THIS LINE (unless you know what you're doing)
 
-int get_number(int min, int def, int max, char label[6]){
+#define BUTTON_L_PIN 15 // GPIO number for left button
+#define BUTTON_SEL_PIN 14 //GPIO number for select button
+#define BUTTON_R_PIN 13 //GPIO number for right button
+#define TZ_OFFSET 3 //time zone offset, modify to your needs
+#define OTP_INTERVAL 30 //interval between new codes in seconds, usually 30
+
+//----------- DO NOT EDIT BELOW THIS LINE (unless you know what you're doing) ------------
+
+int get_number(int min, int def, int max, char label[6]){ //used to ask for time settings on startup
     int curr_num = def;
     printf("\n");
     while (!gpio_get(BUTTON_SEL_PIN)) {
@@ -97,7 +102,10 @@ int main() {
     struct tm tm;
     time_t epoch;
 
-        TOTP(hmacKey, 10, 30);
+    //instantiate TOTP library
+    TOTP(hmacKey, HMAC_KEY_LENGTH, OTP_INTERVAL);
+
+    //main Token generation loop
     while (true) {
         rtc_get_datetime(&t);
         datetime_to_str(datetime_str, sizeof(datetime_buf), &t);
@@ -107,7 +115,6 @@ int main() {
         strptime(datetime_str, "%A %d %b %H:%M:%S %Y", &tm);
         uint32_t newCode = getCodeFromTimestamp(epoch);
         printf("Token: %d\n", newCode);
-        printf("Date: %s  %d\n", datetime_str, epoch);
         sleep_ms(1000);
     }
     return 0;    
