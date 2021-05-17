@@ -20,11 +20,11 @@
 int get_number(int min, int def, int max, char label[6]){ //used to ask for time settings on startup
     int curr_num = def;
     printf("\n");
-    while (!gpio_get(BUTTON_SEL_PIN)) {
+    while (gpio_get(BUTTON_SEL_PIN) == 1) { //inverted because it's pulled up internally
         printf("\r");
         printf("%s: %d", label, curr_num);
-        if (gpio_get(BUTTON_L_PIN)) curr_num--;
-        else if (gpio_get(BUTTON_R_PIN)) curr_num++;
+        if (gpio_get(BUTTON_L_PIN) == 0) curr_num--; //inverted because it's pulled up internally
+        else if (gpio_get(BUTTON_R_PIN) == 0) curr_num++; //inverted because it's pulled up internally
         
         if (curr_num < min) curr_num = max;
         if (curr_num > max) curr_num = min;

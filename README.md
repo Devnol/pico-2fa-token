@@ -16,7 +16,6 @@ Required hardware:
 -----
 - A Raspberry Pi pico and power supply
 - 3x momentary switches
-- 3x 220Ω Resistors
 - A 3.3v character LCD display directly connected to an i2c adapter **or** a 5v LCD connected per the diagram to 5v power supply and the pico
 - An i2c character LCD adapter for use with above LCD
 
