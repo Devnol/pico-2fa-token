@@ -15,11 +15,12 @@ pico_sdk_init()
 add_subdirectory(TOTP-MCU)
 
 add_executable(main
-        main.c
+        main.c 
+        lcd.c
         )
 
 # Pull in our pico_stdlib which aggregates commonly used features
-target_link_libraries(main pico_stdlib hardware_rtc TOTP-MCU)
+target_link_libraries(main pico_stdlib hardware_rtc hardware_i2c TOTP-MCU)
 
 # enable usb output, disable uart output
 pico_enable_stdio_usb(main 1)
