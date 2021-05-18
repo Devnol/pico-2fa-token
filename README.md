@@ -31,8 +31,9 @@ Setup:
 
 - Run ```git submodule update --init``` to install the required library.
 
-- Make a copy of ```token.example.h``` and rename it to ```token.h```, there replace the ```hmacKey[]``` array contents with your token, and ```HMAC_KEY_LENGTH``` with the length of your key.
+- Make a copy of ```token.example.h``` and rename it to ```token.h```, there replace the ```hmacKey[]``` array contents with your token, and ```HMAC_KEY_LENGTH``` with the length of your key and ```OTP_INTERVAL``` with the interval between generating OTP codes (default 30 seconds).
 
-- Open main.c and edit the designated area to fit your time zone, key length and GPIO pin setup.
+- Open main.c and edit the designated area to fit your time zone, LCD size and GPIO pin setup.
+- Open lcd.c and edit addr in line one to your i2c adapter's address (default is 0x3f)
 
 - Build the project and copy main.uf2 to the pico by plugging it in while holding the BOOTSEL button.
